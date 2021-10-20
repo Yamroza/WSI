@@ -59,24 +59,6 @@ def hess_func(x, y):
     return [x_data, y_data]
 
 
-
-# def x_x_dev(x, y):
-#     return 10
-
-# def y_y_dev(x, y):
-#     return 10
-
-# def x_y_dev(x, y):
-#     return 8
-
-# def hessian(x, y):
-#     return [[x_x_dev(x, y), x_y_dev(x, y)], [x_y_dev(x, y), y_y_dev(x, y)]]
-
-# def hess_1(x, y):
-#     return [[5/18, -4/18], [-4/18, 5/18]]
-
-
-
 # drawing a plot
 ax = plt.axes(projection='3d')
 ax.set_xlabel('x')
