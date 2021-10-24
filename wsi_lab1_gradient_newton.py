@@ -27,36 +27,40 @@ HESS = [[10, 8], [8, 10]]
 HESS_1 = [[5/18, -4/18], [-4/18, 5/18]]
 BETA_GRAD = 0.05
 BETA_HES = 1
+EPSILON = 10**(-12)
+ITERS = 50
 X = random.randint(-5, 5)
 Y = random.randint(-5, 5)
 
 
 # Steepest gradient descent method:
-def grad_func(x, y, beta_grad):
+def grad_func(x, y, beta_grad, iterations, epsilon):
     x_data = [x]
     y_data = [y]
-    e = 10**(-12)
-    while (abs(f(x,y))>e):
+    i = 1
+    while (abs(f(x,y))>epsilon or i < iterations):
         d = gradient(x, y)
         x -= d[0] * beta_grad
         y -= d[1] * beta_grad
         x_data.append(x)
         y_data.append(y)
+        i += 1
     return [x_data, y_data]
 
 
 # Newton's Method
-def hess_func(x, y, beta_hess):
+def hess_func(x, y, beta_hess, hessian, iterations, epsilon):
     x_data = [x]
     y_data = [y]
-    e = 10**(-12)
-    while (abs(f(x,y))>e):
+    i = 1
+    while (abs(f(x,y))>epsilon or i < iterations):
         d = gradient(x, y)
-        d1 = [HESS_1[0][0] * d[0] + HESS_1[0][1] * d[1] , HESS_1[1][0] * d[0] + HESS_1[1][1] * d[1]]                     # d1 = hessian^(-1) * gradient
+        d1 = [hessian[0][0] * d[0] + hessian[0][1] * d[1] , hessian[1][0] * d[0] + hessian[1][1] * d[1]]                     # d1 = hessian^(-1) * gradient
         x -= d1[0] * beta_hess
         y -= d1[1] * beta_hess
         x_data.append(x)
         y_data.append(y)
+        i += 1
     return [x_data, y_data]
 
 # times:
@@ -81,25 +85,25 @@ ax.plot_surface(A, B, C, rstride=1, cstride=1,cmap='viridis', edgecolor='none', 
 #To get appropriate plot you should comment one section below:
 #If both sections are uncommented, you get a plot with both methods.
 
-# #Gradient
-# ax.set_title('Steepest gradient descent method')
-# data = grad_func(X, Y, BETA_GRAD)
-# xdata = data[0]
-# ydata = data[1]
-# zdata = []
-# for i in range(len(xdata)):
-#     zdata.append(f(xdata[i], ydata[i]))
-# ax.scatter3D(xdata, ydata, zdata, c="#000000")
-
-#Hessian
-ax.set_title("Newton's method")
-data = hess_func(X, Y, BETA_HES)
+#Gradient
+ax.set_title('Steepest gradient descent method')
+data = grad_func(X, Y, BETA_GRAD, ITERS, EPSILON)
 xdata = data[0]
 ydata = data[1]
 zdata = []
 for i in range(len(xdata)):
     zdata.append(f(xdata[i], ydata[i]))
 ax.scatter3D(xdata, ydata, zdata, c="#000000")
+
+# #Hessian
+# ax.set_title("Newton's method")
+# data = hess_func(X, Y, BETA_HES, HESS_1, ITERS, EPSILON)
+# xdata = data[0]
+# ydata = data[1]
+# zdata = []
+# for i in range(len(xdata)):
+#     zdata.append(f(xdata[i], ydata[i]))
+# ax.scatter3D(xdata, ydata, zdata, c="#000000")
 
 plt.show()
 
