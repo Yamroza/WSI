@@ -63,12 +63,13 @@ def hess_func(x, y, beta_hess, hessian, iterations, epsilon):
         i += 1
     return [x_data, y_data]
 
-# times:
-# def grad_time(x, y, b):
-#     a = grad_func(x, y, b).timeit(number=1)
 
-# def Newton_time(x, y, b):
-#     a = hess_func(x, y, b).timeit(number=1)
+# times:
+def grad_time(x, y, b, iters, eps):
+    return timeit.Timer(lambda: (grad_func(x, y, b, iters, eps))).timeit(number=1)
+
+def nawton_time(x, y, b, hessian, iters, eps):
+    return timeit.Timer(lambda: (hess_func(x, y, b, hessian, iters, eps))).timeit(number=1)
 
 
 # drawing a plot
@@ -107,6 +108,5 @@ ax.scatter3D(xdata, ydata, zdata, c="#000000")
 
 plt.show()
 
-# liczba iteracji
-# mierzenie czasu
+
 # raport
