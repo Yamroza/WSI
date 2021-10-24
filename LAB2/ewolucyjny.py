@@ -45,15 +45,19 @@ def generate_chess_cities(city_quantity):
     return cities
 
 
-def generate_group_cities(city_quantity):
+def generate_group_cities(neighbour_rad):       # 30 cities from definition
+    main_cities = generate_random_cities(5)
     cities = []
-    while len(cities) < city_quantity:
-        x = randint(0, 101)
-        y = randint(0, 101)
-        if [x,y] not in cities:
-            cities.append([x,y])
+    for city in main_cities:
+        temporary_cities = []
+        while len(temporary_cities) < 6:
+            x = randint(city[0]-neighbour_rad, city[0]+neighbour_rad)
+            y = randint(city[1]-neighbour_rad, city[1]+neighbour_rad)
+            if [x,y] not in temporary_cities:
+                temporary_cities.append([x,y])
+        for city in temporary_cities:
+            cities.append(city)
     return cities
-
 
 # def make_city_list(city_list):
 #     city_list.append(city_list[0])
