@@ -68,7 +68,7 @@ def hess_func(x, y, beta_hess, hessian, iterations, epsilon):
 def grad_time(x, y, b, iters, eps):
     return timeit.Timer(lambda: (grad_func(x, y, b, iters, eps))).timeit(number=1)
 
-def nawton_time(x, y, b, hessian, iters, eps):
+def newton_time(x, y, b, hessian, iters, eps):
     return timeit.Timer(lambda: (hess_func(x, y, b, hessian, iters, eps))).timeit(number=1)
 
 
@@ -86,8 +86,8 @@ ax.plot_surface(A, B, C, rstride=1, cstride=1,cmap='viridis', edgecolor='none', 
 #To get appropriate plot you should comment one section below:
 #If both sections are uncommented, you get a plot with both methods.
 
-#Gradient
-ax.set_title('Steepest gradient descent method')
+# Gradient
+ax.set_title('Steepest gradient descent method \n x: %d, y: %d,   B: %f \n exec. time: %f s \n ' % (X, Y, BETA_GRAD, grad_time(X, Y, BETA_GRAD, ITERS, EPSILON)))
 data = grad_func(X, Y, BETA_GRAD, ITERS, EPSILON)
 xdata = data[0]
 ydata = data[1]
@@ -96,8 +96,8 @@ for i in range(len(xdata)):
     zdata.append(f(xdata[i], ydata[i]))
 ax.scatter3D(xdata, ydata, zdata, c="#000000")
 
-# #Hessian
-# ax.set_title("Newton's method")
+#Hessian
+# ax.set_title("Newton's method\n x: %d, y: %d,   B: %f \n exec. time: %f s \n " % (X, Y, BETA_HES, newton_time(X, Y, BETA_HES, HESS_1, ITERS, EPSILON)))
 # data = hess_func(X, Y, BETA_HES, HESS_1, ITERS, EPSILON)
 # xdata = data[0]
 # ydata = data[1]
@@ -107,6 +107,3 @@ ax.scatter3D(xdata, ydata, zdata, c="#000000")
 # ax.scatter3D(xdata, ydata, zdata, c="#000000")
 
 plt.show()
-
-
-# raport
