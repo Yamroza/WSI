@@ -1,3 +1,3 @@
 # WSI
 Zadanka laboratoryjne na przedmiot 
-~WSTĘP DO SZTUCZNEJ INTELIGENCJI~
+*WSTĘP DO SZTUCZNEJ INTELIGENCJI*
