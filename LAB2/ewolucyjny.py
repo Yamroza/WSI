@@ -1,18 +1,10 @@
 import math
 import matplotlib.pyplot as plt
-import numpy as np
 from random import randint
 from random import randrange
 from random import sample
 from random import choice
-
-
-CITY_NUMBER = 30
-
-
-# distance between two chosen cities
-def distance(city_1, city_2):
-    return math.sqrt((city_1[0] - city_2[0])**2 + (city_1[1] - city_2[1])**2)
+import timeit
 
 
 # generating lists of cities
@@ -26,11 +18,11 @@ def generate_random_cities(city_number):
     return cities
 
 
-def generate_chess_cities(city_number):
+def generate_chess_cities(city_number, distance):
     cities = []
     while len(cities) < city_number:
-        x = randrange(0, 101, 10)
-        y = randrange(0, 101, 10)
+        x = randrange(0, 101, distance)
+        y = randrange(0, 101, distance)
         if [x,y] not in cities:
             cities.append([x,y])
     return cities
@@ -51,6 +43,11 @@ def generate_group_cities(groups, elements, neighbour_rad):       # 30 cities fr
     return cities
 
 
+# distance between two chosen cities
+def distance(city_1, city_2):
+    return math.sqrt((city_1[0] - city_2[0])**2 + (city_1[1] - city_2[1])**2)
+
+
 # summary distance between next cities from list
 def summary_distance(city_list):
     mode_city_list = city_list.copy()
@@ -64,7 +61,8 @@ def summary_distance(city_list):
 # population generation based on city list
 def generate_population(members_number, city_list):
     population = []
-    while len(population) < members_number:
+    end = members_number
+    while len(population) < end:
         next_city = sample(city_list, len(city_list))
         if next_city not in population:
             population.append(next_city)
@@ -103,8 +101,8 @@ def modify_population(population, mod_rate):
     modified_elements = []
     while len(modified_elements) < number_to_be_modified:
         ele = choice(population_copy)
-        population_copy.remove(ele)
         modified_elements.append(modify_element(ele))
+        population_copy.remove(ele)
     population_copy += modified_elements
     return population_copy
 
@@ -135,21 +133,26 @@ def draw(winner):
     for i in range(0, len(winner)-1):
         plt.plot([winner[i][0], winner[i+1][0]], [winner[i][1], winner[i+1][1]], 'ro-')
     plt.plot([winner[-1][0], winner[0][0]], [winner[-1][1], winner[0][1]], 'ro-')
-    plt.title("Salesman route", fontsize=19)
     plt.xlabel("Iks", fontsize=10)
     plt.ylabel("Igrek", fontsize=10)
     plt.tick_params(axis='both', which='major', labelsize=9)
     plt.show()
 
 
+# times:
+def route_time(cities_list, population_number, iterations, mod_rate):
+    return timeit.Timer(lambda: (salesman_problem(cities_list, population_number, iterations, mod_rate))).timeit(number=1)
+
+
 # TESTY:
-random_cities = generate_group_cities(3, 2, 4)
-# random_cities = [[15, 55], [20, 70], [65, 55], [95, 10], [20, 5], [95, 45], [10, 45]]
-# random_cities = [[35, 85], [100, 35], [0, 65], [95, 10], [100, 50], [85, 25], [85, 95], [35, 95], [20, 45], [55, 45]]
-print("Random cities: ", random_cities)
-route = salesman_problem(random_cities, 700, 500, 0)
+CITY_NUMBER = 30
+CITY_LIST = generate_random_cities(7)
+POPULATION_NUMBER = 100
+ITERATIONS = 50
+MOD_RATE = 0.1
+
+plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f" % (route_time(CITY_LIST, POPULATION_NUMBER, ITERATIONS, MOD_RATE), POPULATION_NUMBER, ITERATIONS, MOD_RATE ))
+print("City list: ", CITY_LIST)
+route = salesman_problem(CITY_LIST, POPULATION_NUMBER, ITERATIONS, MOD_RATE)
 print("Best route: ", route)
 draw(route)
-
-
-# można zmodyfikować sposób modyfikacji
