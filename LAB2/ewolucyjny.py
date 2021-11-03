@@ -61,8 +61,7 @@ def summary_distance(city_list):
 # population generation based on city list
 def generate_population(members_number, city_list):
     population = []
-    end = members_number
-    while len(population) < end:
+    while len(population) < members_number:
         next_city = sample(city_list, len(city_list))
         if next_city not in population:
             population.append(next_city)
@@ -85,9 +84,10 @@ def turnee_select(population, func):
 # modification of one element
 def modify_element(modify_list):
     if len(modify_list) > 0:
-        first = randint(0, len(modify_list)-2)
-        # second = randint(0, len(modify_list)-1)
-        second = first + 1
+        first = randint(0, len(modify_list)-1)
+        second = randint(0, len(modify_list)-1)
+        while second == first:
+            second = randint(0, len(modify_list)-1)
         temp = modify_list[first]
         modify_list[first] = modify_list[second]
         modify_list[second] = temp
@@ -119,13 +119,16 @@ def turnee_winner_selection(comp_list, func):
 # final algorithm composition
 def salesman_problem(cities_list, population_number, iterations, mod_rate):
     population = generate_population(population_number, cities_list)
+    global_winner = turnee_winner_selection(population, summary_distance)
     i = 0
     while i < iterations:
         new_temp_population = turnee_select(population, summary_distance)
         population = modify_population(new_temp_population, mod_rate)
+        temp_winner = turnee_winner_selection(population, summary_distance)
+        if summary_distance(temp_winner) < summary_distance(global_winner):
+            global_winner = temp_winner
         i += 1
-    winner = turnee_winner_selection(population, summary_distance)
-    return winner
+    return global_winner
 
 
 # drawing a plot of cities
@@ -136,7 +139,7 @@ def draw(winner):
     plt.xlabel("Iks", fontsize=10)
     plt.ylabel("Igrek", fontsize=10)
     plt.tick_params(axis='both', which='major', labelsize=9)
-    plt.show()
+    # plt.show()
 
 
 # times:
@@ -144,15 +147,131 @@ def route_time(cities_list, population_number, iterations, mod_rate):
     return timeit.Timer(lambda: (salesman_problem(cities_list, population_number, iterations, mod_rate))).timeit(number=1)
 
 
-# TESTY:
-CITY_NUMBER = 30
-CITY_LIST = generate_random_cities(7)
-POPULATION_NUMBER = 100
-ITERATIONS = 50
-MOD_RATE = 0.1
+# # TESTY:
+# CITY_NUMBER = 30
+# CITY_LIST = generate_random_cities(CITY_NUMBER)
+# POPULATION_NUMBER = 300
+# ITERATIONS = 1000
+# MOD_RATE = 0.3
+# TIME = route_time(CITY_LIST, POPULATION_NUMBER, ITERATIONS, MOD_RATE)
 
-plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f" % (route_time(CITY_LIST, POPULATION_NUMBER, ITERATIONS, MOD_RATE), POPULATION_NUMBER, ITERATIONS, MOD_RATE ))
-print("City list: ", CITY_LIST)
-route = salesman_problem(CITY_LIST, POPULATION_NUMBER, ITERATIONS, MOD_RATE)
-print("Best route: ", route)
-draw(route)
+
+# zapisywanie do pliku do wykresów:
+# data = open('random_data.txt', 'a')
+# line = ("\n" + str(CITY_NUMBER) + ";" + str(POPULATION_NUMBER) + ";" + str(ITERATIONS) + ";" + str(MOD_RATE) + ";" + str(TIME))
+# print(line)
+# data.write(line)
+# data.close()
+
+
+# plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f" % (TIME, POPULATION_NUMBER, ITERATIONS, MOD_RATE ))
+# print("City list: ", CITY_LIST)
+# route = salesman_problem(CITY_LIST, POPULATION_NUMBER, ITERATIONS, MOD_RATE)
+# print("Best route: ", route)
+# draw(route)
+
+# for city_number in [10, 30]:
+#     city_list = generate_random_cities(city_number)
+#     for population_number in [400]:
+#         for iterations in [10, 100, 1000]:
+#             for mod_rate in [0, 0.2, 0.4]:
+#                 print("City list: ", city_list)
+#                 route = salesman_problem(city_list, population_number, iterations, mod_rate)
+#                 print("Best route: ", route)
+#                 length = round(summary_distance(route), 3)
+#                 time = route_time(city_list, population_number, iterations, mod_rate)
+#                 plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f, distance = %f " % (time, population_number, iterations, mod_rate , length))
+#                 draw(route)
+#                 plt.savefig("Random: Number: %d s, population: %d, iterations: %d, mod: %d" % (city_number, population_number, iterations, mod_rate*10))
+#                 plt.clf()
+#                 data = open('random.txt', 'a')
+#                 line = ("\n" + str(city_number) + ";" + str(population_number) + ";" + str(iterations) + ";" + str(mod_rate) + ";" + str(time) + ";" + str(length))
+#                 print(line)
+#                 data.write(line)
+#                 data.close()
+
+
+# for city_number in [10, 30]:
+#     city_list = generate_chess_cities(city_number, 10)
+#     for population_number in [400]:
+#         for iterations in [10, 100, 1000]:
+#             for mod_rate in [0, 0.2, 0.4]:
+#                 print("City list: ", city_list)
+#                 route = salesman_problem(city_list, population_number, iterations, mod_rate)
+#                 print("Best route: ", route)
+#                 length = round(summary_distance(route), 3)
+#                 time = route_time(city_list, population_number, iterations, mod_rate)
+#                 plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f, distance = %f " % (time, population_number, iterations, mod_rate , length))
+#                 draw(route)
+#                 plt.savefig("Chess: Number: %d s, population: %d, iterations: %d, mod: %d" % (city_number, population_number, iterations, mod_rate*10))
+#                 plt.clf()
+#                 data = open('chess.txt', 'a')
+#                 line = ("\n" + str(city_number) + ";" + str(population_number) + ";" + str(iterations) + ";" + str(mod_rate) + ";" + str(time) + ";" + str(length))
+#                 print(line)
+#                 data.write(line)
+#                 data.close()
+
+
+# # for city_number in [5, 10, 30]:
+# city_number = 6
+# city_list = generate_group_cities(3, 2, 4)
+# for population_number in [10, 100]:
+#     for iterations in [10, 100, 1000]:
+#         for mod_rate in [0, 0.2, 0.4]:
+#             print("City list: ", city_list)
+#             route = salesman_problem(city_list, population_number, iterations, mod_rate)
+#             print("Best route: ", route)
+#             length = round(summary_distance(route), 3)
+#             time = route_time(city_list, population_number, iterations, mod_rate)
+#             plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f, distance = %f " % (time, population_number, iterations, mod_rate , length))
+#             draw(route)
+#             plt.savefig("Group: Number: %d s, population: %d, iterations: %d, mod: %d" % (city_number, population_number, iterations, mod_rate*10))
+#             plt.clf()
+#             data = open('group.txt', 'a')
+#             line = ("\n" + str(city_number) + ";" + str(population_number) + ";" + str(iterations) + ";" + str(mod_rate) + ";" + str(time) + ";" + str(length))
+#             print(line)
+#             data.write(line)
+#             data.close()
+
+# # for city_number in [5, 10, 30]:
+# city_number = 12
+# city_list = generate_group_cities(4, 3, 4)
+# for population_number in [400]:
+#     for iterations in [10, 100, 1000]:
+#         for mod_rate in [0, 0.2, 0.4]:
+#             print("City list: ", city_list)
+#             route = salesman_problem(city_list, population_number, iterations, mod_rate)
+#             print("Best route: ", route)
+#             length = round(summary_distance(route), 3)
+#             time = route_time(city_list, population_number, iterations, mod_rate)
+#             plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f, distance = %f " % (time, population_number, iterations, mod_rate , length))
+#             draw(route)
+#             plt.savefig("Group: Number: %d s, population: %d, iterations: %d, mod: %d" % (city_number, population_number, iterations, mod_rate*10))
+#             plt.clf()
+#             data = open('group.txt', 'a')
+#             line = ("\n" + str(city_number) + ";" + str(population_number) + ";" + str(iterations) + ";" + str(mod_rate) + ";" + str(time) + ";" + str(length))
+#             print(line)
+#             data.write(line)
+#             data.close()
+
+# # # for city_number in [5, 10, 30]:
+
+# city_number = 30
+# city_list = generate_group_cities(6, 5, 4)
+# for population_number in [400]:
+#     for iterations in [10, 100, 1000]:
+#         for mod_rate in [0, 0.2, 0.4]:
+#             print("City list: ", city_list)
+#             route = salesman_problem(city_list, population_number, iterations, mod_rate)
+#             print("Best route: ", route)
+#             length = round(summary_distance(route), 3)
+#             time = route_time(city_list, population_number, iterations, mod_rate)
+#             plt.title("Salesman route\n Exec. time: %f s, population: %d,\niterations: %d, mutate ratio = %f, distance = %f " % (time, population_number, iterations, mod_rate , length))
+#             draw(route)
+#             plt.savefig("Group: Number: %d s, population: %d, iterations: %d, mod: %d" % (city_number, population_number, iterations, mod_rate*10))
+#             plt.clf()
+#             data = open('group.txt', 'a')
+#             line = ("\n" + str(city_number) + ";" + str(population_number) + ";" + str(iterations) + ";" + str(mod_rate) + ";" + str(time) + ";" + str(length))
+#             print(line)
+#             data.write(line)
+#             data.close()
