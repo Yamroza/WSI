@@ -11,11 +11,9 @@ WHITE = (255,255,255)
 
 LINE_WIDTH = 1
 WIDTH = HEIGHT = 420
-
-FPS = 1
+FPS = 5
 
 pygame.init()
-
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Isolation")
 
@@ -24,7 +22,6 @@ class Square:
     def __init__(self, x, y):
         self._x = x
         self._y = y
-        self.col = None
         self._lifespan = 0 # 0-dostępny 1-zajęty 2-wykluczony
 
     def x(self):
@@ -56,11 +53,8 @@ class Field:
             for m in range(rows):
                 self._grid[n].append(Square(n, m))
 
-        self._grid[x1][y1].set_lifespan(1)
-        self._grid[x2][y2].set_lifespan(1)
-
-        print ("Pierwszy:", self._grid[x1][y1].x(), self._grid[x1][y1].y())
-        print ("Drugi:", self._grid[x2][y2].x(), self._grid[x2][y2].y())
+        self._grid[y1][x1].set_lifespan(1)
+        self._grid[y2][x2].set_lifespan(1)
 
         self._win.fill(LIGHT_BLUE)
         for row in range(0, self.rows):
@@ -72,14 +66,22 @@ class Field:
         self.update_moves_list(self.pawn_one)
         self.update_moves_list(self.pawn_two)
 
+    def draw_text(self, x, y, napis, col, size):
+        font = pygame.font.SysFont("Impact", size)
+        tekst = str(napis)
+        text = font.render(tekst, True, col)
+        textbox = text.get_rect()
+        textbox.center = (x, y)
+        self._win.blit(text, textbox)
+
     def update_moves_list(self, pawn):
         pawn.clear_moves()
         for i in [-1, 0, 1]:
             for j in [-1, 0, 1]:
-                if pawn.x() + i > -1 and pawn.y() + j > -1:
+                if pawn.x() + j > -1 and pawn.y() + i > -1 and pawn.x() + j < self.rows and pawn.y() + i < self.rows:
                     try:
-                        if self._grid[pawn.x() + i][pawn.y() + j].lifespan() == 0:
-                            pawn.add_move(self._grid[pawn.x() + i][pawn.y() + j])
+                        if self._grid[pawn.y() + i][pawn.x() + j].lifespan() == 0:
+                            pawn.add_move(self._grid[pawn.y() + i][pawn.x() + j])
                     except:
                         pass
 
@@ -98,37 +100,35 @@ class Field:
 
     def random_move(self, pawn):
         place = random.choice(pawn.moves())
-        for element in self._grid:
-            for mini_element in element:
-                if mini_element.y() == pawn.x() and mini_element.x() == pawn.y():
-                    mini_element.set_lifespan(2)
-        # self._grid[pawn.x()][pawn.y()].set_lifespan(2)
+        self._grid[pawn.y()][pawn.x()].set_lifespan(2)
         pawn.set_x(place.y())
         pawn.set_y(place.x())
         place.set_lifespan(1)
 
+    def heur_move(self, pawn):
+        pass
+
     def endgame(self):
-        self._win.fill(GREEN)
         x, y = WIDTH//2, HEIGHT//2
-        stringo = "Pionek pierwszy" if self.winner == self.pawn_one else "Pionek drugi"
-        # self.draw_text(x+2, y-2, string, BLACK, 40)
-        print("Zwyciezca: ", stringo)
+        stringo = "Pionek zielony wygrał" if self.winner == self.pawn_one else "Pionek pomarańczowy wygrał"
+        self.draw_text(x+2, y-2, stringo, WHITE, 40)
 
     def update(self):
-        if not self.is_winner():
 
+        self.update_moves_list(self.pawn_one)
+        self.update_moves_list(self.pawn_two)
+
+        if not self.is_winner():
             if self.turn == self.pawn_one:
-                self.update_moves_list(self.pawn_one)
                 self.random_move(self.pawn_one)
             else:
-                self.update_moves_list(self.pawn_two)
                 self.random_move(self.pawn_two)
 
             self._win.fill(LIGHT_BLUE)
             for row in range(0, self.rows):
                 for col in range(row % 2, self.rows, 2):
                     pygame.draw.rect(self._win, DARK_BLUE, (col * self.SQUARE_SIZE, row * self.SQUARE_SIZE, self.SQUARE_SIZE, self.SQUARE_SIZE))
-            self._grid[1][1].set_lifespan(2)
+
             for n in range(self.rows):
                 for m in range(self.rows):
                     if self._grid[n][m].lifespan() == 2:
@@ -138,28 +138,24 @@ class Field:
             pygame.draw.circle(self._win, self.pawn_one.colour(), ((self.pawn_one.x() + 0.5) * self.SQUARE_SIZE , (self.pawn_one.y()+0.5) * self.SQUARE_SIZE), self.SQUARE_SIZE/3)
             pygame.draw.circle(self._win, self.pawn_two.colour(), ((self.pawn_two.x() + 0.5) * self.SQUARE_SIZE , (self.pawn_two.y()+0.5) * self.SQUARE_SIZE), self.SQUARE_SIZE/3)
 
-            for n in range(self.rows):
-                for m in range(self.rows):
-                    self.draw_text((m + 0.5) * self.SQUARE_SIZE, (n + 0.5) * self.SQUARE_SIZE, self._grid[n][m].lifespan(), WHITE, 20)
+            # for n in range(self.rows):
+            #     for m in range(self.rows):
+            #         self.draw_text((m + 0.5) * self.SQUARE_SIZE, (n + 0.5) * self.SQUARE_SIZE, self._grid[n][m].lifespan(), WHITE, 20)
 
-            for element in self.pawn_one.moves():
-                print(element.x(), element.y())
-            print("KONIEC")
-        # self.move(self.pawn_one)
-            # for element in self._grid:
-            #     print("(" + to.x() + to.y() + ")" for to in element)
-            # self.change_turn()
+            # if self.turn == self.pawn_one:
+            #     for element in self.pawn_one.moves():
+            #         print(element.x(), element.y())
+            #     print("KONIEC PIERWSZEGO")
+            # else:
+            #     for element in self.pawn_two.moves():
+            #         print(element.x(), element.y())
+            #     print("KONIEC DRUGIEGO")
+
+            self.change_turn()
 
         else:
             self.endgame()
 
-    def draw_text(self, x, y, napis, col, size):
-        font = pygame.font.SysFont("Impact", size)
-        tekst = str(napis)
-        text = font.render(tekst, True, col)
-        textbox = text.get_rect()
-        textbox.center = (x, y)
-        self._win.blit(text, textbox)
 
 class Pawn:
     def __init__(self, x, y, colour):
@@ -202,7 +198,7 @@ def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
-    field = Field(WIN, 4,2,3,2,2)
+    field = Field(WIN, 4,0,0,3,3)
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
@@ -224,5 +220,3 @@ class Stan:
 
 if __name__ == "__main__":
     main()
-
-
