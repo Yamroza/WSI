@@ -27,7 +27,12 @@
 import pygame
 import time
 import random
+<<<<<<< HEAD
+import copy
+from pygame.locals import *
+=======
 from copy import deepcopy
+>>>>>>> 463882ab18fef296802a96f32f2609aba54bba96
 
 LIGHT_BLUE = (50, 185, 250)
 DARK_BLUE = (45, 145, 180)
@@ -38,9 +43,14 @@ WHITE = (255,255,255)
 
 LINE_WIDTH = 1
 WIDTH = HEIGHT = 420
+<<<<<<< HEAD
+FPS = 3
+=======
 FPS = 4
+>>>>>>> 463882ab18fef296802a96f32f2609aba54bba96
 
 pygame.init()
+pygame.display.list_modes()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Isolation")
 
@@ -182,8 +192,7 @@ class Field:
         pygame.draw.circle(self._win, self.pawn_one.colour(), ((self.pawn_one.x() + 0.5) * self.SQUARE_SIZE , (self.pawn_one.y()+0.5) * self.SQUARE_SIZE), self.SQUARE_SIZE/3)
         pygame.draw.circle(self._win, self.pawn_two.colour(), ((self.pawn_two.x() + 0.5) * self.SQUARE_SIZE , (self.pawn_two.y()+0.5) * self.SQUARE_SIZE), self.SQUARE_SIZE/3)
 
-        self.update_moves_list(self.pawn_one)
-        self.update_moves_list(self.pawn_two)
+        self.update_both_moves_list()
 
     def state(self):
         status = []
@@ -242,6 +251,8 @@ class Field:
         pawn.set_x(place.y())
         pawn.set_y(place.x())
         place.set_lifespan(1)
+<<<<<<< HEAD
+=======
         self.change_turn()
 
     def undo_move(self):
@@ -251,11 +262,29 @@ class Field:
         self.move(self.turn, self.last_move)
         self._grid[y][x].set_lifespan(0)
 
+>>>>>>> 463882ab18fef296802a96f32f2609aba54bba96
 
     def random_move(self, pawn):
         place = random.choice(pawn.moves())
         self.move(pawn, place)
 
+<<<<<<< HEAD
+    def update_children(self):
+        self.children = []
+        for move in self.turn.moves():
+            # x1 = copy.deepcopy(self.pawn_one.x())
+            # y1 = copy.deepcopy(self.pawn_one.y())
+            # x2 = copy.deepcopy(self.pawn_two.x())
+            # y2 = copy.deepcopy(self.pawn_two.y())
+            # child = Field(self._win, self.rows, self.pawn_one.x(), self.pawn_one.y(), self.pawn_two.x(), self.pawn_two.y(), self._grid)
+            # child = Field(self._win, self.rows, x1, y1, x2, y2, self._grid)
+            child = copy.deepcopy(self)
+            # child.turn = copy.deepcopy(self.turn)
+            child.move(child.turn, move)
+            child.next_move = move
+            child.change_turn()
+            self.children.append(child)
+=======
 
     # def update_children(self):
     #     self.children = []
@@ -280,6 +309,7 @@ class Field:
     #         child.next_move = move
     #         child.change_turn()
     #         self.children.append(child)
+>>>>>>> 463882ab18fef296802a96f32f2609aba54bba96
 
     def ez_heur(self):
         if self.is_winner():
@@ -439,7 +469,11 @@ def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
+<<<<<<< HEAD
+    field = Field(WIN,4,0,0,3,3)
+=======
     field = Field(WIN,5,0,0,4,4)
+>>>>>>> 463882ab18fef296802a96f32f2609aba54bba96
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
