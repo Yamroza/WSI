@@ -46,6 +46,50 @@ pygame.display.set_caption("Isolation")
 
 
 
+# stan gry = [turn, rows, (x1, y1), (x2, y2), dla każdego pola: (x_pola, y_pola, lifespan_pola)]
+# dzieciaki stanu gry:
+#   - trzeba utworzyć listę ruchów możliwych:
+# def dzieciaki(stan_gry):
+#       available_moves = []
+#         for i in [-1, 0, 1]:
+#             for j in [-1, 0, 1]:  
+#                 if stan_gry[0] = maxi:
+#                    if stan_gry[2][0] + j > -1 and stan_gry[2][1] + i > -1 and stan_gry[2][0] + j < stan_gry[1] and stan_gry[2][1] + i < stan_gry[1]:
+#                     try:
+#                         if stan_gry[ stan_gry[1] * (stan_gry[2][1] + i) + stan_gry[2][0] + j +3][2] == 0:
+#                               available_moves.append(stan_gry[ stan_gry[1] * (stan_gry[2][1] + i) + stan_gry[2][0] + j +3])
+#                     except:
+#                         pass
+#                 else:
+#                    if stan_gry[3][0] + j > -1 and stan_gry[3][1] + i > -1 and stan_gry[3][0] + j < stan_gry[1] and stan_gry[3][1] + i < stan_gry[1]:
+#                     try:
+#                         if stan_gry[ stan_gry[1] * (stan_gry[3][1] + i) + stan_gry[3][0] + j +3][2] == 0:
+#                               available_moves.append(stan_gry[ stan_gry[1] * (stan_gry[3][1] + i) + stan_gry[3][0] + j +3])
+#                     except:
+#                         pass
+#  tworzenie dzieciaków:
+#       for move in available_moves:
+#           move (stan_gry, move) : CZYLI:
+
+#       for move in available_moves:
+#       dzieciak = copy.deepcopy(stan_gry)
+#       if dzieciak[0] == maxi:
+        # dzieciak[2][0] = move[0]                          #         pawn.set_x(place.y())
+        # dzieciak[2][1] = move[1]                          #         pawn.set_y(place.x())
+        # dzieciak[0] = mini                                #         self.change_turn()
+        # dzieciak[(dzieciak[2][1] + move[1]) * dzieciak[1] + dzieciak[2][0] + move[0]][2] = 1 #         place.set_lifespan(1)
+        # else:
+        # dzieciak[2][0] = move[0]
+        # dzieciak[2][1] = move[1]
+        # dzieciak[0] = maxi
+        # for element in dzieciak:
+        #     if element == move:
+        #         element[2] = 2                            #         self._grid[pawn.y()][pawn.x()].set_lifespan(2)
+
+
+def minimax(stan_gry, turn, depth):
+    dzieci = dzieciaki(stan_gry)
+
 
 
 
