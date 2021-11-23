@@ -1,6 +1,17 @@
-from minimax import nowy_minimax
+# from minimaxi import nowy_minimax
 from pawn import Pawn
 from square import Square
+from copy import deepcopy
+
+LIGHT_BLUE = (50, 185, 250)
+DARK_BLUE = (45, 145, 180)
+ORANGE = (255, 180, 35)
+GREEN = (45, 200, 35)
+BLACK = (0,0,0)
+WHITE = (255,255,255)
+
+LINE_WIDTH = 1
+WIDTH = HEIGHT = 420
 
 class Field:
     def __init__(self, win, rows, x1, y1, x2, y2, grid = None):
@@ -182,3 +193,84 @@ class Field:
 
         else:
             self.endgame()
+
+
+class Field_w_p:
+    def __init__(self, rows, x1, y1, x2, y2, sqr_list = None, is_max = True):
+        self.rows = rows
+        self.x1 = x1
+        self.x2 = x2
+        self.y1 = y1
+        self.y2 = y2
+        self.is_max = True 
+        if sqr_list:
+            self.sqr_list = sqr_list
+        else: 
+            self.sqr_list = []
+            for x in range(rows): 
+                lista = []
+                for y in range(rows):
+                    lista.append([x, y, 0])
+                self.sqr_list.append(lista)
+
+        self.winner = None
+        self.sqr_list[y1][x1][2] = 1
+        self.sqr_list[y2][x2][2] = 1
+
+    def move(self, is_max, x, y):
+        if is_max:
+            self.x1 = x
+            self.y1 = y
+        else: 
+            self.x1 = x
+            self.y1 = y
+        self.sqr_list[y][x][2] = 1
+        self.is_max = not self.is_max 
+
+    def available_moves(self, is_max):
+        available_moves = []
+        if is_max:
+            for y  in [-1, 0, 1]:
+                for x in [-1, 0, 1]:
+                    if self.x1 + x > -1 and self.x1 + x < self.rows:
+                        if self.y1 + y > -1 and self.y1 + y < self.rows:
+                            if not (y == 0 and x == 0):
+                                available_moves.append(self.sqr_list[self.y1 + y][self.x1 + x])
+        else:
+            for y  in [-1, 0, 1]:
+                for x in [-1, 0, 1]:
+                    if self.x2 + x > -1 and self.x2 + x < self.rows:
+                        if self.y2 + y > -1 and self.y2 + y < self.rows:
+                            if not (y == 0 and x == 0):
+                                available_moves.append(self.sqr_list[self.y2 + y][self.x2 + x])
+        return available_moves
+
+    def children_list(self):
+        children_list = []
+        for move in self.available_moves(self.is_max):
+            child = deepcopy(self)
+            child.move(child.is_max, move[0], move[1])
+            children_list.append(child)
+        return children_list
+
+    def is_winner(self):
+        if self.is_max:
+            if len(self.available_moves(self.is_max)) == 0:
+                self.winner = not self.is_max
+                return True
+            elif len(self.available_moves(not self.is_max)) == 0:
+                self.winner = self.is_max
+                return True
+            else:
+                return False
+
+    def describe(self):
+        for element in self.sqr_list:
+            print(element)
+
+        
+
+field = Field_w_p(4, 0, 0, 3, 3)
+for child in field.children_list():
+    child.describe()
+    print("KONIEC DZIECKA")
