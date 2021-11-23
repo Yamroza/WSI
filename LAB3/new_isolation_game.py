@@ -1,38 +1,5 @@
-#  s ∈ S to stan i informacja kto wykonuje ruch, , np. ustawienie figur na szachownicy
-#  p ∈ P funkcja następnika, reprezentuje ruchy (posunięcia w grze), p : S → S lista lista stanów
-# spełniających reguły gry
-# • s0 ∈ S to stan początkowy, np. ustawienie początkowe figur na szachownicy
-# • T ⊆ S -to zbiór stanów terminalnych, np. mat w szachach
-# • w to funkcja wypłaty zdefiniowana dla stanów terminalnych s ∈ T, np.
-# w(s) =
-# 1 zwycięstwo gracza
-# 0 remis
-# −1 przegrana
-
-# def Minimax(s,d)          // d - głębokość przeszukiwania
-# if s ∈ T or d = 0 then
-# return h(s)               // heurystyka lub wypłata
-# end
-# U := successors(s)
-# for u in U do
-# w(u) = Minimax(u, d-1 )
-# end
-# if Max-move then          // ruch gracza Max
-# return max(w(u))
-# else
-# return min(w(u))
-# end
-
-
 import pygame
-import time
-import random
-import copy
-from pygame.locals import *
-from minimax import nowy_minimax
-from pawn import Pawn
-from square import Square
-from Board import Field
+from field  import Field_w_p
 
 LIGHT_BLUE = (50, 185, 250)
 DARK_BLUE = (45, 145, 180)
@@ -50,18 +17,43 @@ pygame.display.list_modes()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Isolation")
 
+class Game:
+    def __init__(self, win, field):
+        self.win = win
+        self.field = field
+        self.size = HEIGHT/self.field.rows
+
+    def update(self):
+        self.win.fill(LIGHT_BLUE)
+        for row in range(0, self.field.rows):
+            for col in range(row % 2, self.field.rows, 2):
+                pygame.draw.rect(self.win, DARK_BLUE, (col * self.size, row * self.size, self.size, self.size))
+
+        for x in range(self.field.rows):
+            for y in range(self.field.rows):
+                if self.field.sqr_list[x][y][2] == "-":
+                    pygame.draw.rect(self.win, BLACK, (y * self.size, x * self.size, self.size, self.size))
+
+        pygame.draw.circle(self.win, BLACK, ((self.field.x1 + 0.5) * self.size , (self.field.y1 + 0.5) * self.size), self.size/2.8)
+        pygame.draw.circle(self.win, BLACK, ((self.field.x2 + 0.5) * self.size , (self.field.y2 + 0.5) * self.size), self.size/2.8)
+
+        pygame.draw.circle(self.win, ORANGE, ((self.field.x1 + 0.5) * self.size , (self.field.y1 + 0.5) * self.size), self.size/3)
+        pygame.draw.circle(self.win, GREEN, ((self.field.x2 + 0.5) * self.size , (self.field.y2 + 0.5) * self.size), self.size/3)
+
+        self.field.update()
 
 def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
-    field = Field(WIN,4,0,0,3,3)
+    field = Field_w_p(4, 0, 0, 3, 3, 3)
+    game = Game(WIN, field)
     while run:
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        field.update()
+        game.update()
         pygame.display.update()
 
     pygame.quit()

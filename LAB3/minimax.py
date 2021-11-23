@@ -1,8 +1,3 @@
-from pawn import Pawn
-from square import Square
-from Board import Field
-
-
 def ez_heur(field):
     if field.is_max:
         return len(field.available_moves(field.is_max)) - len(field.available_moves(not field.is_max))
@@ -20,7 +15,7 @@ def minimax_basic(field, depth):
             return -1
     else:
         scores = []
-        for child in field.children():
+        for child in field.children_list():
             scores.append(minimax_basic(child, depth-1))
         if is_max:
             return max(scores)
