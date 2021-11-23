@@ -6,9 +6,10 @@ def ez_heur(field):
 
 def minimax_basic(field, depth):
     is_max = field.is_max
+    ist = field.is_winner()
     if depth == 0:
         return ez_heur(field)
-    elif field.is_winner():
+    elif ist:
         if field.winner:
             return 1
         else:

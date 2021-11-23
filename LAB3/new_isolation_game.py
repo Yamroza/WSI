@@ -10,7 +10,7 @@ WHITE = (255,255,255)
 
 LINE_WIDTH = 1
 WIDTH = HEIGHT = 420
-FPS = 3
+FPS = 4
 
 pygame.init()
 pygame.display.list_modes()
@@ -37,8 +37,8 @@ class Game:
         pygame.draw.circle(self.win, BLACK, ((self.field.x1 + 0.5) * self.size , (self.field.y1 + 0.5) * self.size), self.size/2.8)
         pygame.draw.circle(self.win, BLACK, ((self.field.x2 + 0.5) * self.size , (self.field.y2 + 0.5) * self.size), self.size/2.8)
 
-        pygame.draw.circle(self.win, ORANGE, ((self.field.x1 + 0.5) * self.size , (self.field.y1 + 0.5) * self.size), self.size/3)
-        pygame.draw.circle(self.win, GREEN, ((self.field.x2 + 0.5) * self.size , (self.field.y2 + 0.5) * self.size), self.size/3)
+        pygame.draw.circle(self.win, GREEN, ((self.field.x1 + 0.5) * self.size , (self.field.y1 + 0.5) * self.size), self.size/3)
+        pygame.draw.circle(self.win, ORANGE, ((self.field.x2 + 0.5) * self.size , (self.field.y2 + 0.5) * self.size), self.size/3)
 
         self.field.update()
 
@@ -46,7 +46,7 @@ def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
-    field = Field_w_p(4, 0, 0, 3, 3, 3)
+    field = Field_w_p(rows=4, x1=0, y1=0, x2=3, y2=3, mode=4, depth=3)
     game = Game(WIN, field)
     while run:
         clock.tick(FPS)
@@ -61,3 +61,9 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# MODES:
+# 1. minimax vs minimax
+# 2. random vs random
+# 3. minimax vs random
+# 4. random vs minimax

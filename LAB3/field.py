@@ -4,15 +4,16 @@ import random
 
 
 class Field_w_p:
-    def __init__(self, rows, x1, y1, x2, y2, depth = None):
+    def __init__(self, rows, x1, y1, x2, y2, mode = 1, depth = 2):
         self.rows = rows
         self.x1 = x1
         self.x2 = x2
         self.y1 = y1
         self.y2 = y2
+        self.mode = mode
+        self.depth = depth if depth else 2
         self.is_max = True 
         self.move_to_safe = None
-        self.depth = depth if depth else 2
         self.sqr_list = []
         for x in range(rows): 
             lista = []
@@ -20,7 +21,7 @@ class Field_w_p:
                 lista.append([y, x, 0])
             self.sqr_list.append(lista)
 
-        self.winner = None
+        self.winner = False
         self.sqr_list[y1][x1][2] = 'P'
         self.sqr_list[y2][x2][2] = 'L'
 
@@ -72,15 +73,19 @@ class Field_w_p:
         return children_list
 
     def is_winner(self):
-        if self.is_max:
-            if len(self.available_moves(self.is_max)) == 0:
-                self.winner = not self.is_max
-                return True
-            elif len(self.available_moves(not self.is_max)) == 0:
-                self.winner = self.is_max
+        if self.is_max == False:
+            if len(self.available_moves(False)) == 0:
+                self.winner = True
                 return True
             else:
                 return False
+        else:
+            if len(self.available_moves(True)) == 0:
+                self.winner = False
+                return True
+            else:
+                return False
+
 
     def describe(self):
         for element in self.sqr_list:
@@ -110,7 +115,20 @@ class Field_w_p:
     def update(self):
         check = self.is_winner()
         if not check:
-            random_move = self.heur_move(self.depth)
+            if self.mode == 1:
+                random_move = self.heur_move(self.depth)
+            elif self.mode == 2:
+                random_move = self.random_move()
+            elif self.mode == 3:
+                if self.is_max:
+                    random_move = self.heur_move(self.depth)
+                else:
+                    random_move = self.random_move()
+            else:
+                if not self.is_max:
+                    random_move = self.heur_move(self.depth)
+                else:
+                    random_move = self.random_move()
             x = random_move[0]
             y = random_move[1]
             self.move(self.is_max, x, y)
