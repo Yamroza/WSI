@@ -1,21 +1,19 @@
 import pygame
-from field  import Field_w_p
+from field import Field
 
 LIGHT_BLUE = (50, 185, 250)
 DARK_BLUE = (45, 145, 180)
 ORANGE = (255, 180, 35)
 GREEN = (45, 200, 35)
 BLACK = (0,0,0)
-WHITE = (255,255,255)
 
-LINE_WIDTH = 1
 WIDTH = HEIGHT = 420
-FPS = 4
+FPS = 10
 
 pygame.init()
-pygame.display.list_modes()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Isolation")
+
 
 class Game:
     def __init__(self, win, field):
@@ -31,7 +29,7 @@ class Game:
 
         for x in range(self.field.rows):
             for y in range(self.field.rows):
-                if self.field.sqr_list[x][y][2] == "-":
+                if self.field.squares_list[x][y][2] == "-":
                     pygame.draw.rect(self.win, BLACK, (y * self.size, x * self.size, self.size, self.size))
 
         pygame.draw.circle(self.win, BLACK, ((self.field.x1 + 0.5) * self.size , (self.field.y1 + 0.5) * self.size), self.size/2.8)
@@ -42,11 +40,12 @@ class Game:
 
         self.field.update()
 
+
 def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
-    field = Field_w_p(rows=4, x1=0, y1=0, x2=3, y2=3, mode=4, depth=3)
+    field = Field(rows=4, x1=0, y1=0, x2=3, y2=3, mode=4, depth=3)
     game = Game(WIN, field)
     while run:
         clock.tick(FPS)
@@ -55,7 +54,8 @@ def main():
                 run = False
         game.update()
         pygame.display.update()
-
+        # if game.field.is_winner():
+        #     break
     pygame.quit()
 
 

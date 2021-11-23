@@ -3,10 +3,10 @@ from copy import deepcopy
 import random 
 
 
-class Field_w_p:
+class Field:
     def __init__(self, rows, x1, y1, x2, y2, mode = 1, depth = 2):
         self.rows = rows
-        self.x1 = x1
+        self.x1= x1
         self.x2 = x2
         self.y1 = y1
         self.y2 = y2
@@ -14,28 +14,29 @@ class Field_w_p:
         self.depth = depth if depth else 2
         self.is_max = True 
         self.move_to_safe = None
-        self.sqr_list = []
+        self.squares_list = []
         for x in range(rows): 
             lista = []
             for y in range(rows):
                 lista.append([y, x, 0])
-            self.sqr_list.append(lista)
+            self.squares_list.append(lista)
 
         self.winner = False
-        self.sqr_list[y1][x1][2] = 'P'
-        self.sqr_list[y2][x2][2] = 'L'
+        self.written = False
+        self.squares_list[y1][x1][2] = 'P'
+        self.squares_list[y2][x2][2] = 'L'
 
     def move(self, is_max, x, y):
         if is_max:
-            self.sqr_list[self.y1][self.x1][2] = '-'
+            self.squares_list[self.y1][self.x1][2] = '-'
             self.x1 = x
             self.y1 = y
-            self.sqr_list[self.y1][self.x1][2] = 'P'
+            self.squares_list[self.y1][self.x1][2] = 'P'
         else: 
-            self.sqr_list[self.y2][self.x2][2] = '-'
+            self.squares_list[self.y2][self.x2][2] = '-'
             self.x2 = x
             self.y2 = y
-            self.sqr_list[self.y2][self.x2][2] = 'L'
+            self.squares_list[self.y2][self.x2][2] = 'L'
         self.change_turn()
     
 
@@ -51,23 +52,23 @@ class Field_w_p:
                     if self.x1 + x > -1 and self.x1 + x < self.rows:
                         if self.y1 + y > -1 and self.y1 + y < self.rows:
                             if not (y == 0 and x == 0):
-                                if self.sqr_list[self.y1 + y][self.x1 + x][2] == 0:
-                                    available_moves.append(self.sqr_list[self.y1 + y][self.x1 + x])
+                                if self.squares_list[self.y1 + y][self.x1 + x][2] == 0:
+                                    available_moves.append(self.squares_list[self.y1 + y][self.x1 + x])
         else:
             for y  in [-1, 0, 1]:
                 for x in [-1, 0, 1]:
                     if self.x2 + x > -1 and self.x2 + x < self.rows:
                         if self.y2 + y > -1 and self.y2 + y < self.rows:
                             if not (y == 0 and x == 0):
-                                if self.sqr_list[self.y2 + y][self.x2 + x][2] == 0:
-                                    available_moves.append(self.sqr_list[self.y2 + y][self.x2 + x])
+                                if self.squares_list[self.y2 + y][self.x2 + x][2] == 0:
+                                    available_moves.append(self.squares_list[self.y2 + y][self.x2 + x])
         return available_moves
 
     def children_list(self):
         children_list = []
         for move in self.available_moves(self.is_max):
             child = deepcopy(self)
-            child.move_to_safe = deepcopy(move)                           # idk czy te deepcopy tu potrzebne
+            child.move_to_safe = move
             child.move(child.is_max, move[0], move[1])
             children_list.append(child)
         return children_list
@@ -88,7 +89,7 @@ class Field_w_p:
 
 
     def describe(self):
-        for element in self.sqr_list:
+        for element in self.squares_list:
             print(element) 
 
     def random_move(self):
@@ -134,6 +135,10 @@ class Field_w_p:
             self.move(self.is_max, x, y)
             check = self.is_winner()
         else:
-            print("-----------GAME IS OVER------------")
-            string = "GREEN" if self.winner else "ORANGE"
-            print("WINNER IS" , string)  
+            if not self.written:
+                print("-----------GAME IS OVER------------")
+                string = "GREEN" if self.winner else "ORANGE"
+                print("WINNER IS" , string)  
+                self.written = True
+            else:
+                pass
