@@ -97,21 +97,25 @@ class Field:
         return random.choice(moves)
 
     def heur_move(self, depth):
-        best_move = None
+        best_moves = []
         children = self.children_list()
         if self.is_max:
             best_value = -999  
             for child in children:
                 if minimax_basic(child, depth) > best_value:
                     best_value = minimax_basic(child, depth)
-                    best_move = child.move_to_safe
+                    best_moves = [child.move_to_safe]
+                elif minimax_basic(child, depth) == best_value:
+                    best_moves.append(child.move_to_safe)
         else:
             best_value = 999  
             for child in children:
                 if minimax_basic(child, depth) < best_value:
                     best_value = minimax_basic(child, depth)
-                    best_move = child.move_to_safe
-        return best_move
+                    best_moves = [child.move_to_safe]
+                elif minimax_basic(child, depth) == best_value:
+                    best_moves.append(child.move_to_safe)
+        return random.choice(best_moves)
 
     def update(self):
         check = self.is_winner()
@@ -142,3 +146,10 @@ class Field:
                 self.written = True
             else:
                 pass
+
+    def play_game(self):
+        check = self.is_winner()
+        while not check:
+            self.update()
+            check = self.is_winner()
+        return self.winner
