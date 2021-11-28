@@ -8,7 +8,7 @@ GREEN = (45, 200, 35)
 BLACK = (0,0,0)
 
 WIDTH = HEIGHT = 420
-FPS = 10
+FPS = 4
 
 pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -41,29 +41,52 @@ class Game:
         self.field.update()
 
 
-def main():
-    global FPS
-    run = True
-    clock = pygame.time.Clock()
-    field = Field(rows=4, x1=0, y1=0, x2=3, y2=3, mode=4, depth=3)
-    game = Game(WIN, field)
-    while run:
-        clock.tick(FPS)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
-        game.update()
-        pygame.display.update()
-        # if game.field.is_winner():
-        #     break
-    pygame.quit()
+# def main():
+#     global FPS
+#     run = True
+#     clock = pygame.time.Clock()
+#     field = Field(rows=4, x1=0, y1=0, x2=3, y2=3, mode=1, depth=1)
+#     game = Game(WIN, field)
+#     while run:
+#         clock.tick(FPS)
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 run = False
+#         game.update()
+#         pygame.display.update()
+#         # if game.field.is_winner():
+#         #     break
+#     pygame.quit()
 
+def main():
+    rows = 4
+    for mode in [1, 2, 3]:
+        for depth in [1, 3, 5]:
+            trues = 0
+            for i in range(100):
+                field = Field(rows=rows, x1=1, y1=1, x2=2, y2=2, mode=mode, depth=depth)
+                one = field.play_game()
+                if one:
+                    trues +=1 
+            falses = 100 - trues
+            data = open('random_data.txt', 'w')
+            line = ("\n" + str(mode) + ";" + str(depth) + ";" + str(trues) + ";" + str(falses))
+            data.write(line)
+
+# def main():
+#     field = Field(rows=4, x1=0, y1=0, x2=3, y2=2, mode=1, depth=1)
+#     winner = field.play_game()
+#     string = "GREEN" if  winner else "ORANGE"
+#     print("Winner is: ", string)
 
 if __name__ == "__main__":
     main()
 
 # MODES:
 # 1. minimax vs minimax
-# 2. random vs random
-# 3. minimax vs random
-# 4. random vs minimax
+# 2. minimax vs random
+# 3. random vs minimax
+# 4. random vs random
+
+
+
