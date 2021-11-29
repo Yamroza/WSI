@@ -1,4 +1,5 @@
 import pygame
+from random import randint
 from field import Field
 
 LIGHT_BLUE = (50, 185, 250)
@@ -41,52 +42,56 @@ class Game:
         self.field.update()
 
 
-# def main():
-#     global FPS
-#     run = True
-#     clock = pygame.time.Clock()
-#     field = Field(rows=4, x1=0, y1=0, x2=3, y2=3, mode=1, depth=1)
-#     game = Game(WIN, field)
-#     while run:
-#         clock.tick(FPS)
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 run = False
-#         game.update()
-#         pygame.display.update()
-#         # if game.field.is_winner():
-#         #     break
-#     pygame.quit()
-
 def main():
-    rows = 4
-    for mode in [1, 2, 3]:
-        for depth in [1, 3, 5]:
-            trues = 0
-            for i in range(100):
-                field = Field(rows=rows, x1=1, y1=1, x2=2, y2=2, mode=mode, depth=depth)
-                one = field.play_game()
-                if one:
-                    trues +=1 
-            falses = 100 - trues
-            data = open('random_data.txt', 'w')
-            line = ("\n" + str(mode) + ";" + str(depth) + ";" + str(trues) + ";" + str(falses))
-            data.write(line)
+    global FPS
+    run = True
+    clock = pygame.time.Clock()
+    field = Field(rows=4, x1=0, y1=0, x2=3, y2=3, mode=1, depth=1)
+    game = Game(WIN, field)
+    while run:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        game.update()
+        pygame.display.update()
+    pygame.quit()
+
+
+# przeprowadzanie prób: 
 
 # def main():
-#     field = Field(rows=4, x1=0, y1=0, x2=3, y2=2, mode=1, depth=1)
-#     winner = field.play_game()
-#     string = "GREEN" if  winner else "ORANGE"
-#     print("Winner is: ", string)
+#     rows = 4
+#     for mode in [1, 3, 4]:
+#         for depth in [1, 3, 5]:
+#             trues = 0
+#             for i in range(100):
+#                 x1= randint(0,3) 
+#                 y1= randint(0,3)
+#                 x2= randint(0,3)
+#                 y2= randint(0,3)
+#                 while (x2 == x1 and y2 == y1):
+#                     x2= randint(0,3)
+#                     y2= randint(0,3)
+#                 field = Field(rows=rows, x1=x1, y1=y1, x2=x2, y2=y2, mode=mode, depth=depth)
+#                 one = field.play_game()
+#                 if one:
+#                     trues +=1 
+#             falses = 100 - trues
+#             data = open('data.txt', 'a')
+#             line = ("\n" + str(mode) + ";" + str(depth) + ";" + str(trues) + ";" + str(falses))
+#             data.write(line)
+
 
 if __name__ == "__main__":
     main()
 
 # MODES:
 # 1. minimax vs minimax
-# 2. minimax vs random
-# 3. random vs minimax
-# 4. random vs random
+# 2. random vs random
+# 3. minimax vs random
+# 4. random vs minimax
+
 
 
 

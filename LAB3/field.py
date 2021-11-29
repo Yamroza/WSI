@@ -1,4 +1,4 @@
-from minimax import minimax_basic
+from minimax import minimax
 from copy import deepcopy
 import random 
 
@@ -102,18 +102,18 @@ class Field:
         if self.is_max:
             best_value = -999  
             for child in children:
-                if minimax_basic(child, depth) > best_value:
-                    best_value = minimax_basic(child, depth)
+                if minimax(child, depth) > best_value:
+                    best_value = minimax(child, depth)
                     best_moves = [child.move_to_safe]
-                elif minimax_basic(child, depth) == best_value:
+                elif minimax(child, depth) == best_value:
                     best_moves.append(child.move_to_safe)
         else:
             best_value = 999  
             for child in children:
-                if minimax_basic(child, depth) < best_value:
-                    best_value = minimax_basic(child, depth)
+                if minimax(child, depth) < best_value:
+                    best_value = minimax(child, depth)
                     best_moves = [child.move_to_safe]
-                elif minimax_basic(child, depth) == best_value:
+                elif minimax(child, depth) == best_value:
                     best_moves.append(child.move_to_safe)
         return random.choice(best_moves)
 
