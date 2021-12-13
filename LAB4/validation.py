@@ -1,19 +1,6 @@
-from tree import Tree, AllNode
+from tree import Tree
 from dataset import Dataset
 import pandas as pd 
-import numpy as np
-
-
-
-# def predict_with_cross_validate(dataset, k):
-#     rows = len(dataset.index)
-#     part = rows / k
-#     for i in range(k):
-#         if i = 0:
-#         train_dataset = dataset.iloc[,2*i - 1]
-#         test_dataset = dataset.iloc[:(i-1), (2*i - i)]
-#         df_1 = df.iloc[:1000,:]
-
 
 
 def i3(train_data, test_data):
@@ -31,11 +18,13 @@ def i3(train_data, test_data):
 # FN - False Negative: jest tą klasą a pokazało że nią nie jest
 
 # Recall = FP / (FP + TN)
+# Fall-out = FP / (FP + TN)
 # Precision = TP / (TP + FP)
 # Accuracy = (TP + TN) / (TP + TN + FP + FN)
+# F1 score = (2 * Recall * Precision) / (Recall + Precision)
 
 
-def true_positive(train_data, test_data):
+def metrics_vector(train_data, test_data):
     predictions = i3(train_data, test_data)
     real_values = test_data[test_data.columns[-1]].values
     t_p = 0
@@ -52,22 +41,12 @@ def true_positive(train_data, test_data):
                 t_p += 1
     f_n = f_n - t_p - t_n - f_p
     recall = f_p / (f_p + t_n)
-    precistion = t_p / (t_p + f_p)
+    fall_out = f_p / (f_p + t_n)
+    precision = t_p / (t_p + f_p)
     accuracy = (t_p + t_n) / ( t_p + t_n + f_n + f_p)
+    f1_score = (2 * recall * precision) / (recall + precision)
 
-    return t_p, f_p/2, t_n, f_n/2 
-
-
-
-def draw_matrix(train_data, test_data):
-    score_values = train_data[train_data.columns[-1]].unique()
-    # wektor = 
-    print("            " , end = "")
-    for score_value in score_values:
-        print(score_value, end = "  ")
-    print("")
-    for score_value in score_values:
-        print(score_value) #, wektor)
+    return [recall, fall_out, precision, accuracy, f1_score]
 
 
 def dataset_matrix(train_data, test_data):
@@ -90,16 +69,14 @@ def main():
     dataset = pd.read_csv('nursery.csv')
     train_data = dataset.iloc[:12000, :]
     test_data = dataset.iloc[12000:, :]
-    # predictions = i3(train_data, test_data)
-    # should_be = test_data[test_data.columns[-1]].values
-    # for element, should in zip(predictions, should_be):
-    #     if element == should:
-    #         print("Wyszlo: " , element , "Powinno: ", should, "   Dobrze")
-    #     else:
-    #         print("Wyszlo: " , element , "Powinno: ", should, "   ŹLE")
-
-
+    
     # t_p, f_p, t_n, f_n = true_positive(train_data, test_data)
+    metrics =  metrics_vector(train_data, test_data)
+    print("recall = ", metrics[0])
+    print("fall_out = ", metrics[1])
+    print("precion = ", metrics[2])
+    print("accuracy = ", metrics[3])
+    print("f1_score = ", metrics[4], "\n")
     # print("TP: ", t_p)
     # print("FP: ", f_p)
     # print("TN: ", t_n)
@@ -109,16 +86,6 @@ def main():
     print(dataset_matrix(train_data, test_data))
 
     # draw_matrix(train_data, test_data)
-
-
-    # train_data = Dataset(dataset)
-    # tree = Tree(train_data)
-    # tree.save("drewo.txt")
-    # pr = tree.predict(["C",1,"ok","xd"])
-    # row = ["usual","proper","complete","1","convenient","convenient","nonprob","recommended", "cos"]
-    # pr = tree.predict(['usual', 'proper', 'complete', '2', 'convenient', 'inconv', 'problematic', 'recommended'])
-    # pr = tree.predict(row)
-    # print(pr)
 
 if __name__ == "__main__":
     main()
