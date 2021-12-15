@@ -7,31 +7,9 @@ class Dataset:
 
         self.dataset = dataset
 
-
-    def get_dataset_columns(self):
-        return [column for column in self.dataset.columns] 
-
-    def last_column(self):
-        return self.dataset.columns[-1]
-
-    def get_category_id(self, category):
-        columns = self.get_dataset_columns()
-        found = False
-        id = 0
-        while not found:
-            if columns[id] == category:
-                found = True
-            else:
-                id += 1
-        return id
-
-    def count(self, value, category):
-        number = self.dataset[category].value_counts()[value]
-        return number
-
-
     def frequency(self, value, category):
-        return self.count(value, category) / len(self.dataset.index)
+        number = self.dataset[category].value_counts()[value]
+        return number / len(self.dataset.index)
 
 
     def complete_entropy(self):      #entropia zbioru U (całego)
@@ -57,14 +35,14 @@ class Dataset:
         return self.complete_entropy() - self.category_entropy(category)
 
 
-    def dsc_inf_gains(self):
+    def best_inf_gains(self):
         entropies = []
-        columns = self.get_dataset_columns()
+        columns = [column for column in self.dataset.columns] 
         columns.pop()
         for column in columns:
             entropies.append([self.inf_gain(column), column])
         entropies.sort(reverse=True)
-        return entropies 
+        return entropies[0]
 
 
     def split_by_category_plus(self, category):
@@ -76,3 +54,15 @@ class Dataset:
             mini_category.drop(category, axis=1, inplace=True)
             mini_categories.append(mini_category)
         return mini_categories, values
+
+
+    def get_category_id(self, category):
+        columns = self.dataset.columns
+        found = False
+        id = 0
+        while not found:
+            if columns[id] == category:
+                found = True
+            else:
+                id += 1
+        return id
