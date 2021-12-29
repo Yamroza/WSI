@@ -1,11 +1,6 @@
 from random import randint, choice, uniform
-from typing import AsyncIterator
 import numpy as np
-from numpy.core.fromnumeric import argmax
 
-EPSILON = 0.1
-GAMMA = 0.6
-ALPHA = 0.1 #  learning rate (beta u Wawrzyńskiego)
 
 def generate_lab(n, holes):
     lab = []
@@ -76,77 +71,42 @@ class Musk_Taxi:
 
 
     def make_action(self, action):
-        # w dół
-        if action == 0:     
-            if self.x + 1 == self.rows: 
-                return -10
-            elif self.lab[self.x + 1][self.y] == 1:
-                self.done = True
-                return -10
-            else:
-                self.x += 1
-                if self.y == self.y_done and self.x == self.x_done:
-                    self.done = True
-                    return 20
-                else:
-                    return -1
-        # w górę
-        elif action == 1:   
-            if self.x - 1 < 0:
-                return -10
-            elif self.lab[self.x - 1][self.y] == 1:
-                self.done = True
-                return -10
-            else:
-                self.x -= 1
-                if self.y == self.y_done and self.x == self.x_done:
-                    self.done = True
-                    return 20
-                else:
-                    return -1
-        # w lewo
-        elif action == 2:   
-            if self.y - 1 < 0:
-                return -10
-            elif self.lab[self.x][self.y - 1] == 1:
-                self.done = True
-                return -10
-            else:
-                self.y -= 1
-                if self.y == self.y_done and self.x == self.x_done:
-                    self.done = True
-                    return 20
-                else:
-                    return -1
-        # w prawo
-        elif action == 3:   
-            if self.y + 1 == self.rows:
-                return -10
-            elif self.lab[self.x][self.y + 1] == 1:
-                self.done = True
-                return -10
-            else:
-                self.y += 1
-                if self.y == self.y_done and self.x == self.x_done:
-                    self.done = True
-                    return 20
-                else:
-                    return -1
-    
+        previous_position = self.x, self.y
+        if action == 0: 
+            self.x += 1
+        elif action == 1: 
+            self.x -= 1
+        elif action == 2: 
+            self.y -= 1
+        elif action == 3: 
+            self.y += 1
+        if self.y == self.y_done and self.x == self.x_done:
+            self.done = True
+            return 20
+        elif self.x == self.rows or self.y == self.rows or self.x < 0 or self.y < 0:
+            self.x, self.y = previous_position
+            return -10
+        elif self.lab[self.x][self.y] == 1:
+            self.done = True
+            return -10
+        else:
+            return -1
+
+            
 
     def is_done(self):
         if self.y == self.y_done and self.x == self.x_done:
             return True
 
     def no_of_states(self):
+        # real number of states is decreased by number of holes, but 
+        # here it's easier to leave them and never use them than to delete them
         return self.rows ** 2
 
     def get_state(self):
+        # every state number is unique
         state = self.x * self.rows + self.y
         return state
-
-    def q_table(self):
-        q_table = np.zeros((self.no_of_states(), 4))
 
 
 class Random_car:
@@ -162,17 +122,32 @@ class Random_car:
         return steps
 
 
+def generate_q_table(columns, rows):
+    return np.zeros((columns, rows))
+
+def update_q_table(q_table, state, action, beta, gamma, reward, new_state):
+    new_state_max = np.max(q_table[new_state])
+    q_table[state, action] = (1-beta) * q_table[state, action] + beta * (reward + gamma * new_state_max - q_table[state, action])
+    
+
 # TESTS:
 def main():
+
+    # parameters:
+    epsilon = 0.1
+    gamma = 0.6
+    beta = 0.1      #  learning rate
+
     taxi = Musk_Taxi(5, 5)
-    q_table = np.zeros((taxi.no_of_states(), 4))
+    q_table = generate_q_table(taxi.no_of_states(), 4)
+
     interval_steps = []
     for i in range(100):
         steps = []
         taxi = Musk_Taxi(5, 5)
         while not taxi.done:
             state = taxi.get_state()
-            if uniform(0,1) < EPSILON:
+            if uniform(0,1) < epsilon:
                 action = randint(0,3)
             else:
                 action = np.argmax(q_table[state])
@@ -180,54 +155,28 @@ def main():
                 steps.append(action)
             reward = taxi.make_action(action)
             new_state = taxi.get_state()
-            new_state_max = np.max(q_table[new_state])
-            q_table[state, action] = (1-ALPHA) * q_table[state, action] + ALPHA * (reward + GAMMA * new_state_max - q_table[state, action])
+            update_q_table(q_table, state, action, beta, gamma, reward, new_state)
         if i % 20 == 0:
             interval_steps.append(steps)
 
-    taxi = Musk_Taxi(5, 5)
-    for row in taxi.lab:
-        print(row)
-    steps = 0
-    while not taxi.done:
-        state = taxi.get_state()
-        if uniform(0,1) < EPSILON:
-            action = randint(0,3)
-        else:
-            action = np.argmax(q_table[state])
-        reward = taxi.make_action(action)
-        new_state = taxi.get_state()
-        new_state_max = np.max(q_table[new_state])
-        q_table[state, action] = (1-ALPHA) * q_table[state, action] + ALPHA * (reward + GAMMA * new_state_max - q_table[state, action])
-        steps += 1
+    print(interval_steps[-1])
+    # taxi = Musk_Taxi(5, 5)
+    # for row in taxi.lab:
+    #     print(row)
+    # steps = 0
+    # while not taxi.done:
+    #     state = taxi.get_state()
+    #     if uniform(0,1) < epsilon:
+    #         action = randint(0,3)
+    #     else:
+    #         action = np.argmax(q_table[state])
+    #     reward = taxi.make_action(action)
+    #     new_state = taxi.get_state()
+    #     update_q_table(q_table, state, action, beta, gamma, reward, new_state)
+    #     steps += 1
     
 
-    print(steps)
-
-
-
-    # for row in taxi.lab:
-    #     print(row)
-    # print(taxi.available_moves)
-
-    # reward = taxi.make_action(0)
-    # print("Reward: ", reward)
-    # print(taxi.x, ", " , taxi.y)
-    # for row in taxi.lab:
-    #     print(row)
-
-    # reward = taxi.make_action(3)
-    # print("Reward: ", reward)
-    # print(taxi.x, ", " , taxi.y)
-    # for row in taxi.lab:
-    #     print(row)
-
-    # lab = generate_lab(5,5)
-    # save_lab_to_file(lab, 'saved_lab.txt')
-
-    # lab = read_lab_from_file('saved_lab.txt')
-    # for row in lab:
-    #     print(row)
+    # print(steps)
 
 
     # random_car = Random_car()
