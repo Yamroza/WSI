@@ -9,7 +9,7 @@ GREEN = (45, 200, 35)
 BLACK = (0,0,0)
 RED = (255, 0, 0)
 
-WIDTH = HEIGHT = 420
+WIDTH = HEIGHT = 840
 FPS = 1
 
 pygame.init()
@@ -22,6 +22,9 @@ class Game:
         self.win = win
         self.taxi = taxi
         self.size = HEIGHT/self.taxi.rows
+        self.steps = [0, 0, 3, 3, 0, 0, 3, 3]
+        self.iter = 0
+        self.image = pygame.image.load('LAB6/car1.jpg')
 
     def update(self):
         self.win.fill(LIGHT_BLUE)
@@ -35,9 +38,13 @@ class Game:
                     pygame.draw.rect(self.win, RED, (y * self.size, x * self.size, self.size, self.size))
                     pygame.draw.rect(self.win, BLACK, ((y + 0.03)* self.size, (x + 0.03) * self.size, self.size * 0.95, self.size * 0.95))
 
+        self.win.blit(self.image, (self.taxi.y * self.size, self.taxi.x * self.size))
+        # pygame.draw.circle(self.win, BLACK, ((self.taxi.y + 0.5) * self.size , (self.taxi.x + 0.5) * self.size), self.size/2.8)
+        # pygame.draw.circle(self.win, GREEN, ((self.taxi.y + 0.5) * self.size , (self.taxi.x + 0.5) * self.size), self.size/3)
 
-        pygame.draw.circle(self.win, BLACK, ((self.taxi.x + 0.5) * self.size , (self.taxi.y + 0.5) * self.size), self.size/2.8)
-        pygame.draw.circle(self.win, GREEN, ((self.taxi.x + 0.5) * self.size , (self.taxi.y + 0.5) * self.size), self.size/3)
+        self.taxi.make_action(self.steps[self.iter])
+        if self.iter < len(self.steps) - 1:
+            self.iter += 1    
 
 
 def main():
