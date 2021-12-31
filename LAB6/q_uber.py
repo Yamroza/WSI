@@ -57,7 +57,6 @@ class Musk_Taxi:
         self.x_done = self.rows - 1
         self.y_done = self.rows - 1
         self.done = False
-        # self.available_moves = self.check_available_moves()
         
     def make_action(self, action):
         previous_position = self.x, self.y
@@ -89,23 +88,36 @@ class Musk_Taxi:
                 action = randint(0,3)
             else:
                 action = np.argmax(q_table[state])
-            steps.append(action)
             reward = self.make_action(action)
+            steps.append(action)
+            if reward == -10:
+                if action%2 == 0:
+                    steps.append(action+1)
+                else:
+                    steps.append(action-1)
             next_state = self.get_state()
             q_table = update_q_table(q_table, state, action, beta, gamma, reward, next_state)
         return steps, q_table
-            
-    def is_done(self):
-        if self.y == self.y_done and self.x == self.x_done:
-            return True
+
+    def random_drive(self, random_table):
+        steps = []
+        while not self.done:
+            state = self.get_state()
+            action = choice(random_table[state])
+            reward = self.make_action(action)
+            steps.append(action)
+            if reward == -10:
+                random_table[state].remove(action)
+                if action%2 == 0:
+                    steps.append(action+1)
+                else:
+                    steps.append(action-1)
+        return steps, random_table
 
     def no_of_states(self):
-        # real number of states is decreased by number of holes, but 
-        # here it's easier to leave them and never use them than to delete them
         return self.rows ** 2
 
     def get_state(self):
-        # every state number is unique
         state = self.x * self.rows + self.y
         return state
 
@@ -135,6 +147,13 @@ class Musk_Taxi:
 def generate_q_table(columns, rows):
     return np.zeros((columns, rows))
 
+def generate_random_table(states):
+    random_table = []
+    for _ in range(states):
+        random_table.append([0,1,2,3])
+    return random_table
+
+
 def update_q_table(q_table, state, action, beta, gamma, reward, next_state):
     next_state_max = np.max(q_table[next_state])
     # q_table[state, action] = (1-beta) * q_table[state, action] + beta * (reward + gamma * next_state_max - q_table[state, action])
@@ -147,38 +166,36 @@ def update_q_table(q_table, state, action, beta, gamma, reward, next_state):
 def main():
 
     # parameters:
-    # epsilon = 0.1
-    # gamma = 0.6
-    # beta = 0.1      #  learning rate
+    epsilon = 0.1
+    gamma = 0.6
+    beta = 0.1      #  learning rate
     
-    data = open('taxi_data.txt', 'a')
-    # line = "epsilon;gamma;beta;iterations"
-    # data.write(line)
-    expected_steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
-    for epsilon in [0.15, 0.3]:
-        for gamma in [0.4, 0.6, 0.8]:
-            for beta in [0.1, 0.3, 0.5]:
-                steps = []
-                q_table = generate_q_table(64, 4)
-                iteration_no = 0
-                while steps != expected_steps:
-                    taxi = Musk_Taxi(8, 5)
-                    steps = []
-                    steps, q_table = taxi.drive(q_table, beta, gamma, epsilon)
-                    iteration_no += 1
-                line = ("\n" + str(epsilon) + ";" + str(gamma) + ";" + str(beta) + ";" + str(iteration_no))
-                data.write(line)
-    data.close()
-
+    # expected_steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
+    # steps = []
+    q_table = generate_q_table(64, 4)
+    # random_table = generate_random_table(64)
+    # iteration_no = 0
     # interval_steps = []
-    # for i in range(10000):
-    #     steps = []
+    # # while steps != expected_steps:
+    # for _ in range(10000):
     #     taxi = Musk_Taxi(8, 5)
-    #     steps, q_table = taxi.drive(q_table, beta, gamma, epsilon)
-    #     if i % 20 == 0:
+    #     steps = []
+    #     steps, random_table = taxi.random_drive(random_table)
+    #     iteration_no += 1
+    #     if iteration_no % 10 == 0:
     #         interval_steps.append(steps)
-
     # print(interval_steps[-1])
+        
+
+    interval_steps = []
+    for i in range(10000):
+        steps = []
+        taxi = Musk_Taxi(8, 5)
+        steps, q_table = taxi.drive(q_table, beta, gamma, epsilon)
+        if i % 20 == 0:
+            interval_steps.append(steps)
+
+    print(interval_steps[-1])
 
 
 
