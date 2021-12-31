@@ -13,7 +13,7 @@ RED = (255, 0, 0)
 GRAY = (80,80,80)
 
 WIDTH = HEIGHT = 840
-FPS = 5
+FPS = 10
 
 pygame.init()
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -25,16 +25,19 @@ class Game:
         self.win = win
         self.taxi = taxi
         self.size = HEIGHT/self.taxi.rows
+        # expected steps:
         self.steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
+        # example random steps
+        # self.steps = [0, 0, 0, 0, 1, 3, 2, 1, 1, 0, 0, 3, 1, 0, 1, 3, 3, 1, 0, 0, 1, 2, 3, 2, 2, 0, 1, 2, 3, 0, 1, 3, 3, 1, 3, 2, 1, 2, 2, 2, 0, 1, 0, 1, 3, 3, 2, 2, 0, 1, 3, 2, 3, 2, 3, 2, 0, 1, 3, 3, 2, 2, 0, 0, 1, 0, 0, 1, 0, 3, 1, 0, 1, 3, 3, 2, 2, 0, 2, 1, 0, 1, 3, 3, 3, 0, 1, 0, 1, 1, 0, 1, 3, 2, 0, 0, 1, 1, 1, 0, 3, 3, 1, 3, 2, 0, 1, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2, 3, 0, 1, 0, 0, 0, 1, 2, 2, 3, 2, 3, 3, 2, 2, 3, 3, 1, 0, 2, 3, 1, 0, 2, 3, 0, 1, 1, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 1, 1, 2, 3, 0, 1, 2, 3, 0, 0, 1, 0, 1, 0, 1, 1, 2, 3, 1, 0, 2, 3, 0, 0, 2, 3, 2, 3, 1, 0, 0, 1, 2, 2, 0, 1, 0, 1, 0, 1, 0, 1, 0, 2, 3, 2, 2, 3, 3, 1, 3, 3, 0, 1, 2, 2, 0, 2, 2, 3, 3, 1, 0, 2, 2, 3, 2, 3, 2, 2, 3, 2, 1, 0, 0, 1, 3, 2, 0, 0, 3, 3, 3, 3, 3]
         self.iter = 0
         image = Image.open('LAB6/car.jpg')
         new_image = image.resize((int(self.size), int(self.size)))
         new_image.save('LAB6/car12.jpg')
         self.car_image = pygame.image.load('LAB6/car12.jpg')
-        image = Image.open('LAB6/lantern.jpg')
+        image = Image.open('LAB6/student.jpg')
         new_image = image.resize((int(self.size*0.94), int(self.size*0.94)))
-        new_image.save('LAB6/lantern12.jpg')
-        self.lantern_image = pygame.image.load('LAB6/lantern12.jpg')
+        new_image.save('LAB6/student12.jpg')
+        self.lantern_image = pygame.image.load('LAB6/student12.jpg')
 
     def update(self):
         self.win.fill(BLACK)
@@ -71,7 +74,7 @@ def main():
         pygame.display.update()
     pygame.quit()
     os.remove('LAB6/car12.jpg')
-    os.remove('LAB6/lantern12.jpg')
+    os.remove('LAB6/student12.jpg')
 
 
 if __name__ == "__main__":
