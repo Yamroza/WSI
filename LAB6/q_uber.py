@@ -21,8 +21,45 @@ def generate_lab(n, holes):
     return lab
 
 
-def deep_first_search(lab) -> bool: 
-    return True
+class Node:
+    def __init__(self, x, y, lab):
+        self.x = x
+        self.y = y
+        self.lab = lab
+        self.rows = len(lab)
+        self.kids = self.check_available_moves()
+
+    def check_available_moves(self):
+        available_moves = []
+        for y, x in zip([-1, 1, 0, 0], [0, 0, -1, 1]):
+            if self.x + x > -1 and self.x + x < self.rows:
+                if self.y + y > -1 and self.y + y < self.rows:
+                    if self.lab[self.x + x][self.y + y] == 0:
+                        available_moves.append([self.y+y,self.x+x])
+        return available_moves
+
+
+def dfs(lab):
+    first = Node(0,0,lab)
+    last = Node(len(lab)-1, len(lab)-1,lab)
+    possible_nodes = node_dfs([], lab, first)
+    is_possible = False
+    for element in possible_nodes:
+        if element.x == last.x and element.y == last.y:
+            is_possible = True
+    return is_possible
+
+
+def node_dfs(visited, lab, node):
+    in_list = False
+    for element in visited:
+        if element.x == node.x and element.y == node.y:
+            in_list = True
+    if not in_list:
+        visited.append(node)
+        for kid in node.check_available_moves():
+            node_dfs(visited, lab, Node(kid[1], kid[0], lab))
+    return visited
 
 
 def save_lab_to_file(lab, file_name):
@@ -122,28 +159,6 @@ class Musk_Taxi:
         return state
 
 
-# class Random_car(Musk_Taxi):
-#     def __init__(self, musk_taxi = Musk_Taxi(8, 3)):
-#         self.taxi = musk_taxi
-
-#     def steps(self):
-#         steps = 0
-#         while not self.taxi.is_done():
-#             move = choice(self.taxi.check_available_moves())
-#             self.taxi.y, self.taxi.x = move
-#             steps += 1
-#         return steps
-
-#     def check_available_moves(self):
-#         available_moves = []
-#         for y, x in zip([-1, 1, 0, 0], [0, 0, -1, 1]):
-#             if self.taxi.x + x > -1 and self.taxi.x + x < self.rows:
-#                 if self.taxi.y + y > -1 and self.taxi.y + y < self.rows:
-#                     if self.lab[self.taxi.x + x][self.taxi.y + y] == 0:
-#                         available_moves.append([self.taxi.y+y,self.taxi.x+x])
-#         return available_moves
-
-
 def generate_q_table(columns, rows):
     return np.zeros((columns, rows))
 
@@ -165,39 +180,40 @@ def update_q_table(q_table, state, action, beta, gamma, reward, next_state):
 # TESTS:
 def main():
 
-    # parameters:
-    epsilon = 0.1
-    gamma = 0.6
-    beta = 0.1      #  learning rate
+    # # parameters:
+    # epsilon = 0.1
+    # gamma = 0.6
+    # beta = 0.1      #  learning rate
     
-    # expected_steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
-    # steps = []
-    q_table = generate_q_table(64, 4)
-    # random_table = generate_random_table(64)
-    # iteration_no = 0
-    # interval_steps = []
-    # # while steps != expected_steps:
-    # for _ in range(10000):
-    #     taxi = Musk_Taxi(8, 5)
-    #     steps = []
-    #     steps, random_table = taxi.random_drive(random_table)
-    #     iteration_no += 1
-    #     if iteration_no % 10 == 0:
-    #         interval_steps.append(steps)
-    # print(interval_steps[-1])
+    # # expected_steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
+    # # steps = []
+    # q_table = generate_q_table(64, 4)
+    # # random_table = generate_random_table(64)
+    # # iteration_no = 0
+    # # interval_steps = []
+    # # # while steps != expected_steps:
+    # # for _ in range(10000):
+    # #     taxi = Musk_Taxi(8, 5)
+    # #     steps = []
+    # #     steps, random_table = taxi.random_drive(random_table)
+    # #     iteration_no += 1
+    # #     if iteration_no % 10 == 0:
+    # #         interval_steps.append(steps)
+    # # print(interval_steps[-1])
         
 
-    interval_steps = []
-    for i in range(10000):
-        steps = []
-        taxi = Musk_Taxi(8, 5)
-        steps, q_table = taxi.drive(q_table, beta, gamma, epsilon)
-        if i % 20 == 0:
-            interval_steps.append(steps)
+    # interval_steps = []
+    # for i in range(10000):
+    #     steps = []
+    #     taxi = Musk_Taxi(8, 5)
+    #     steps, q_table = taxi.drive(q_table, beta, gamma, epsilon)
+    #     if i % 20 == 0:
+    #         interval_steps.append(steps)
 
-    print(interval_steps[-1])
+    # print(interval_steps[-1])
 
-
+    lab = read_lab_from_file('LAB6/saved_lab.txt')
+    print(dfs(lab))
 
     # lab = generate_lab(8, 20)
     # save_lab_to_file(lab, 'LAB6/saved_lab.txt')
