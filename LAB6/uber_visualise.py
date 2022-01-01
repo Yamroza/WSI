@@ -1,4 +1,5 @@
 import pygame
+from q_uber import read_lab_from_file
 from random import randint
 from PIL import Image
 from q_uber import Musk_Taxi
@@ -63,7 +64,8 @@ def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
-    taxi = Musk_Taxi(8, 10)
+    lab = read_lab_from_file('saved_lab.txt')
+    taxi = Musk_Taxi(lab)
     game = Game(WIN, taxi)
     while run:
         clock.tick(FPS)

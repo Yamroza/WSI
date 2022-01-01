@@ -84,17 +84,30 @@ def read_lab_from_file(file_name):
 
 
 class Musk_Taxi:
-    def __init__(self, rows, holes):
-        self.rows = rows
-        self.holes = holes
-        # self.lab = generate_lab(self.rows, holes)
-        self.lab = read_lab_from_file('LAB6/saved_lab.txt')
+    """
+    Car class
+    Available moves:
+    action 1 - down
+    action 2 - up
+    action 3 - left
+    action 4 - right
+    
+    Rewards:
+    driving outside the labyrynth: -10
+    hitting a person: -10
+    achieving goal: +20
+    proper move: -1
+    """
+
+    def __init__(self, lab):
+        self.rows = len(lab)
+        self.lab = lab
         self.x = 0
         self.y = 0
         self.x_done = self.rows - 1
         self.y_done = self.rows - 1
         self.done = False
-        
+
     def make_action(self, action):
         previous_position = self.x, self.y
         if action == 0: 
@@ -149,6 +162,8 @@ class Musk_Taxi:
                     steps.append(action+1)
                 else:
                     steps.append(action-1)
+            if reward == 20:
+                steps.append(4)
         return steps, random_table
 
     def no_of_states(self):
@@ -162,6 +177,7 @@ class Musk_Taxi:
 def generate_q_table(columns, rows):
     return np.zeros((columns, rows))
 
+
 def generate_random_table(states):
     random_table = []
     for _ in range(states):
@@ -171,71 +187,63 @@ def generate_random_table(states):
 
 def update_q_table(q_table, state, action, beta, gamma, reward, next_state):
     next_state_max = np.max(q_table[next_state])
-    # q_table[state, action] = (1-beta) * q_table[state, action] + beta * (reward + gamma * next_state_max - q_table[state, action])
     q_table[state, action] += beta * (reward + gamma * next_state_max - q_table[state, action])
-
     return q_table
     
 
 # TESTS:
 def main():
 
-    # # parameters:
-    # epsilon = 0.1
-    # gamma = 0.6
-    # beta = 0.1      #  learning rate
-    
-    # # expected_steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
-    # # steps = []
-    # q_table = generate_q_table(64, 4)
-    # # random_table = generate_random_table(64)
-    # # iteration_no = 0
-    # # interval_steps = []
-    # # # while steps != expected_steps:
-    # # for _ in range(10000):
-    # #     taxi = Musk_Taxi(8, 5)
-    # #     steps = []
-    # #     steps, random_table = taxi.random_drive(random_table)
-    # #     iteration_no += 1
-    # #     if iteration_no % 10 == 0:
-    # #         interval_steps.append(steps)
-    # # print(interval_steps[-1])
-        
+    # parameters:
+    epsilon = 0.05
+    gamma = 0.6
+    beta = 0.5
 
+    lab = read_lab_from_file('saved_lab.txt')
+    
+    steps = [0]
+    random_table = generate_random_table(64)
+    iteration_no = 0
     # interval_steps = []
-    # for i in range(10000):
-    #     steps = []
-    #     taxi = Musk_Taxi(8, 5)
-    #     steps, q_table = taxi.drive(q_table, beta, gamma, epsilon)
-    #     if i % 20 == 0:
-    #         interval_steps.append(steps)
-
-    # print(interval_steps[-1])
-
-    lab = read_lab_from_file('LAB6/saved_lab.txt')
-    print(dfs(lab))
-
-    # lab = generate_lab(8, 20)
-    # save_lab_to_file(lab, 'LAB6/saved_lab.txt')
+    while steps[-1] != 4:
+        taxi = Musk_Taxi(lab)
+        steps = []
+        steps, random_table = taxi.random_drive(random_table)
+        iteration_no += 1
+        # if iteration_no % 10 == 0:
+        #     interval_steps.append(steps)
+    iters_needed = iteration_no
+    best_steps = steps
+    for _ in range(1000):
+        taxi = Musk_Taxi(lab)
+        steps = []
+        steps, random_table = taxi.random_drive(random_table)
+        iteration_no += 1
+        # if iteration_no % 10 == 0:                  # <- here you can change interval of saved steps
+        #     interval_steps.append(steps)
+        if len(steps) < len(best_steps):
+            best_steps = steps
+    # print(interval_steps)                         # <- uncommenting this part allows you to follow progress
+    print(best_steps)
+    print("Length of best found route: ", len(best_steps))
+    print("Iterations needed to find random route: ", iters_needed)
     
 
+    expected_steps = [3, 3, 3, 0, 3, 3, 0, 3, 3, 0, 0, 2, 2, 0, 2, 2, 2, 0, 0, 3, 3, 3, 3, 3]
+    steps = []
+    q_table = generate_q_table(64, 4)
+    iteration_no = 0
+    # interval_steps = []
+    while steps != expected_steps:
+        taxi = Musk_Taxi(lab)
+        steps = []
+        steps, random_table = taxi.drive(q_table, beta, gamma, epsilon)
+        iteration_no += 1
+        # if iteration_no % 10 == 0:
+        #     interval_steps.append(steps)
+    # print(interval_steps[-1])
+    print("Iterations needed to find q-uber route: ", iteration_no)
 
-
-    # random_car = Random_car()
-    # steps = random_car.steps()
-    # print(steps)
 
 if __name__ == "__main__":
     main()
-
-# AKCJE:
-# action 1 - w dół
-# action 2 - w górę
-# action 3 - w lewo
-# action 4 - w prawo
-
-# KARY:
-# poza pole? : -10
-# w stażystę : -10
-# ruch po prostu : -1
-# dotrze do celu : +20 
