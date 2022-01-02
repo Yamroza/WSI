@@ -199,7 +199,14 @@ def main():
     gamma = 0.6
     beta = 0.5
 
+    
+    # lab = generate_lab(8, 20)
+    # while not dfs(lab):
+    #     lab = generate_lab(8, 20)
+    # save_lab_to_file(lab, 'test.txt')
+
     lab = read_lab_from_file('saved_lab.txt')
+
     
     steps = [0]
     random_table = generate_random_table(64)
@@ -219,11 +226,11 @@ def main():
         steps = []
         steps, random_table = taxi.random_drive(random_table)
         iteration_no += 1
-        # if iteration_no % 10 == 0:                  # <- here you can change interval of saved steps
+        # if iteration_no % 10 == 0:
         #     interval_steps.append(steps)
         if len(steps) < len(best_steps):
             best_steps = steps
-    # print(interval_steps)                         # <- uncommenting this part allows you to follow progress
+    # print(interval_steps)
     print(best_steps)
     print("Length of best found route: ", len(best_steps))
     print("Iterations needed to find random route: ", iters_needed)
@@ -234,7 +241,9 @@ def main():
     q_table = generate_q_table(64, 4)
     iteration_no = 0
     # interval_steps = []
-    while steps != expected_steps:
+
+    # for _ in range(2000):             # for random generated lab
+    while steps != expected_steps:      # for prepared saved lab
         taxi = Musk_Taxi(lab)
         steps = []
         steps, random_table = taxi.drive(q_table, beta, gamma, epsilon)
@@ -243,6 +252,7 @@ def main():
         #     interval_steps.append(steps)
     # print(interval_steps[-1])
     print("Iterations needed to find q-uber route: ", iteration_no)
+    print(steps)
 
 
 if __name__ == "__main__":

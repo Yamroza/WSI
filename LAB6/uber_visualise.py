@@ -64,7 +64,10 @@ def main():
     global FPS
     run = True
     clock = pygame.time.Clock()
+
     lab = read_lab_from_file('saved_lab.txt')
+    # lab = read_lab_from_file('test.txt')
+
     taxi = Musk_Taxi(lab)
     game = Game(WIN, taxi)
     while run:
