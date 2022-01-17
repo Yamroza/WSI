@@ -14,16 +14,13 @@ def get_dataframe(file_name="./LAB7/wine.data",
                                 "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline"]):
                     
                                 
-    dataframe = pd.read_csv(file_name, names=header_list)
-    cols = dataframe.columns.tolist()
-    cols = cols[1:] + cols[:1]
-    return dataframe[cols]
+    return pd.read_csv(file_name, names=header_list)
 
 
 def split_by_class(dataset):
         mini_datasets = []
         values = []
-        classes = dataset.columns.tolist()[-1]
+        classes = dataset.columns.tolist()[0]
         for value in dataset[classes].unique():
             values.append(value)
             mini_class = dataset[dataset[classes] == value]
@@ -80,8 +77,9 @@ def predict_dataset(train_data, test_data):
     for index, row in test_data.iterrows():
         chosen_row = row.tolist()
         if len(chosen_row) > 0:
-            row_values = chosen_row[:-1]
-            real_value = chosen_row[-1]
+            row_values = chosen_row[1:]
+            print("długość: ", len(row_values), "wiersz: ", row_values)
+            real_value = chosen_row[0]
             predictions.append(predict_class(classes_stats, values, row_values))
             real_values.append(int(real_value))
     return predictions, real_values
@@ -89,9 +87,9 @@ def predict_dataset(train_data, test_data):
 
 def metrics_vector(train_data, test_data):
     predictions, real_values =  predict_dataset(train_data, test_data)
-    real_values = test_data[test_data.columns[-1]].values
+    real_values = test_data[test_data.columns[0]].values
     t_p, f_p, f_n, t_n  = 0, 0, 0, test_data.shape[0]
-    for score_value in test_data[test_data.columns[-1]].unique():
+    for score_value in test_data[test_data.columns[0]].unique():
         for prediction, real_value in zip(predictions, real_values):
             if prediction == score_value and real_value != score_value:
                 f_p += 1
@@ -116,12 +114,13 @@ def confusion_matrix(predictions, real_values):
     df = pd.DataFrame(data, columns=['y_Actual','y_Predicted'])
     confusion_matrix = pd.crosstab(df['y_Predicted'], df['y_Actual'], rownames=['Predicted'], colnames=['Actual'])
     sn.heatmap(confusion_matrix, annot=True, cmap='Blues', fmt='g')
-    plt.savefig("proba_dobra.png")
+    plt.savefig("proba.png")
 
 
 def main():
     dataset = get_dataframe()
     dataset = shuffle(dataset)
+    print(dataset)
     train_data, test_data = sc.train_test_split(dataset, test_size = 0.1)
     predictions, real_values = predict_dataset(train_data, test_data)
     confusion_matrix(predictions, real_values)
