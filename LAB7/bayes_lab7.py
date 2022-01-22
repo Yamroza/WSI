@@ -1,19 +1,19 @@
+from platform import release
 import pandas as pd
 import statistics
 import math
+from pyparsing import java_style_comment
 import sklearn.model_selection as sc
 from sklearn.utils import shuffle
 import seaborn as sn
 from matplotlib import pyplot as plt
 
 
-def get_dataframe(file_name="./LAB7/wine.data",
+def get_dataframe(file_name="wine.data",
                    header_list=["Wine class", "Alcohol", "Malic acid", "Ash",
                                 "Alcalinity of ash", "Magnesium", "Total phenols",
                                 "Flavanoids", "Nonflavanoid phenols", "Proanthocyanins", 
-                                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline"]):
-                    
-                                
+                                "Color intensity", "Hue", "OD280/OD315 of diluted wines", "Proline"]):          
     return pd.read_csv(file_name, names=header_list)
 
 
@@ -78,7 +78,6 @@ def predict_dataset(train_data, test_data):
         chosen_row = row.tolist()
         if len(chosen_row) > 0:
             row_values = chosen_row[1:]
-            print("długość: ", len(row_values), "wiersz: ", row_values)
             real_value = chosen_row[0]
             predictions.append(predict_class(classes_stats, values, row_values))
             real_values.append(int(real_value))
@@ -102,9 +101,13 @@ def metrics_vector(train_data, test_data):
     t_n = t_n - t_p - f_n - f_p
     recall = f_p / (f_p + t_n)
     fall_out = f_p / (f_p + t_n)
-    precision = t_p / (t_p + f_p)
+    try: precision = t_p / (t_p + f_p)
+    except ZeroDivisionError: precision = 0
     accuracy = (t_p + t_n) / ( t_p + t_n + f_n + f_p)
-    f1_score = (2 * recall * precision) / (recall + precision)
+    if precision == 0:
+        f1_score = 0
+    else:
+        f1_score = (2 * recall * precision) / (recall + precision)
     return [predictions, real_values, recall, fall_out, precision, accuracy, f1_score]
 
     
@@ -114,11 +117,44 @@ def confusion_matrix(predictions, real_values):
     df = pd.DataFrame(data, columns=['y_Actual','y_Predicted'])
     confusion_matrix = pd.crosstab(df['y_Predicted'], df['y_Actual'], rownames=['Predicted'], colnames=['Actual'])
     sn.heatmap(confusion_matrix, annot=True, cmap='Blues', fmt='g')
-    plt.savefig("proba.png")
+    plt.savefig("proba_wsi.png")
+
+
+def testing_data(dataset):
+    minisets, values = split_by_class(dataset)
+    category_list = dataset.columns.tolist()
+    del(category_list[0])
+    del(category_list[11])
+    for i in range(len(category_list)):
+        for j in range(len(category_list)):
+            if i < j:
+                cat_1 = category_list[i]
+                cat_2 = category_list[j]
+                for k in range(len(values)):
+                    cat_1 = category_list[i]
+                    cat_2 = category_list[j]
+                    list_1 = minisets[k][cat_1].tolist()
+                    list_2 = minisets[k][cat_2].tolist()
+                    kolor = 'seagreen'
+                    if values[k] == 1:
+                        kolor = 'royalblue'
+                    if values[k] == 2:
+                        kolor = 'deeppink'
+                    plt.plot(list_1, list_2, 'o', color = kolor, label = f'Class {values[k]}')
+                plt.legend()
+                title = cat_1 + " - " + cat_2
+                plt.title(title)
+                plt.xlabel(cat_1)
+                plt.ylabel(cat_2)
+                title_png = title + ".png"
+                plt.savefig(title_png)
+                plt.clf()
 
 
 def main():
     dataset = get_dataframe()
+    # testing_data(dataset)
+    print(dataset.columns.tolist())
     dataset = shuffle(dataset)
     print(dataset)
     train_data, test_data = sc.train_test_split(dataset, test_size = 0.1)

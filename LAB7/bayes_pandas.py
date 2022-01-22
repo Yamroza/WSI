@@ -127,6 +127,21 @@ def main():
     confusion_matrix(predictions, real_values)
     print(predictions)
     print(real_values)
+    
+     # data = open("new_bayes.txt", 'a')
+    # rows = dataset.shape[0]
+    # for test_size in [0.7, 0.8, 0.9]:
+    #     train_data = dataset[int(rows * test_size) :]
+    #     test_data = dataset[: int(rows * (1-test_size))]
+    #     predictions, real_values, recall, fall_out, precision, accuracy, f1_score = metrics_vector(train_data, test_data)
+    #     print(predictions)
+    #     print(real_values)
+        # line = (f'0;{test_size};{recall};{fall_out};{precision};{accuracy};{f1_score}')
+        # line_png = line + ".png"
+        # line += "\n"
+        # data.write(line)
+        # confusion_matrix(predictions, real_values, line_png)
+    # data.close()
 
 
 if __name__ == "__main__":
